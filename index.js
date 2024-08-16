@@ -42,8 +42,8 @@ async function run() {
             const skip = (page - 1) * limit;
             const searchQuery = req.query.search || "";
             const selectedCategory = req.query.category || "";
-            const selectedBrand = req.query.brand || "";
-            const selectedPriceRange = req.query.priceRange || "";
+            const selectedBrand = req.query.name || "";
+            const selectedPriceRange = req.query.price || "";
             const sortOption = req.query.sort || "";
         
             // Build the query object
@@ -54,13 +54,20 @@ async function run() {
             }
         
             if (selectedBrand) {
-                query.brand = selectedBrand;
+                query.name = selectedBrand;
             }
         
             if (selectedPriceRange) {
-                const maxPrice = parseInt(selectedPriceRange);
-                query.price = { $lte: maxPrice };
-            }
+                const priceRange = selectedPriceRange.split('-').map(price => parseFloat(price));
+                if (priceRange.length === 2) {
+                  const [minPrice, maxPrice] = priceRange;
+                  query.price = { $gte: minPrice.toString(), $lte: maxPrice.toString() };
+                } else if (priceRange.length === 1) {
+                  const maxPrice = priceRange[0];
+                  query.price = { $lte: maxPrice.toString() };
+                }
+              }
+              
         
             // Count total documents based on the query
             const total = await productCollection.countDocuments(query);
@@ -93,6 +100,9 @@ async function run() {
                     return {};
             }
         }
+        
+        
+        
         
         
         
