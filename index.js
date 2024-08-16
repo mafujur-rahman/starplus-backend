@@ -38,12 +38,36 @@ async function run() {
 
         app.get('/products', async (req, res) => {
             const page = parseInt(req.query.page) || 1;
-            const limit = parseInt(req.query.limit) || 10;
+            const limit = parseInt(req.query.limit) || 9;
             const skip = (page - 1) * limit;
             const searchQuery = req.query.search || "";
+            const selectedCategory = req.query.category || "";
+            const selectedBrand = req.query.brand || "";
+            const selectedPriceRange = req.query.priceRange || "";
+            const sortOption = req.query.sort || "";
         
-            const total = await productCollection.countDocuments({ name: { $regex: searchQuery, $options: 'i' } });
-            const products = await productCollection.find({ name: { $regex: searchQuery, $options: 'i' } })
+            // Build the query object
+            let query = { name: { $regex: searchQuery, $options: 'i' } };
+        
+            if (selectedCategory) {
+                query.category = selectedCategory;
+            }
+        
+            if (selectedBrand) {
+                query.brand = selectedBrand;
+            }
+        
+            if (selectedPriceRange) {
+                const maxPrice = parseInt(selectedPriceRange);
+                query.price = { $lte: maxPrice };
+            }
+        
+            // Count total documents based on the query
+            const total = await productCollection.countDocuments(query);
+        
+            // Fetch the products with filters, sorting, and pagination
+            const products = await productCollection.find(query)
+                .sort(getSortOptions(sortOption))
                 .skip(skip)
                 .limit(limit)
                 .toArray();
@@ -55,6 +79,21 @@ async function run() {
                 products
             });
         });
+        
+        // Function to get sort options based on sortOption parameter
+        function getSortOptions(sortOption) {
+            switch (sortOption) {
+                case 'priceLowHigh':
+                    return { price: 1 };
+                case 'priceHighLow':
+                    return { price: -1 };
+                case 'newest':
+                    return { dateAdded: -1 };
+                default:
+                    return {};
+            }
+        }
+        
         
         
         // Send a ping to confirm a successful connection
