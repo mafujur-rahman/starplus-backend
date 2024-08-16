@@ -34,6 +34,28 @@ async function run() {
             const result = await productCollection.insertOne(productData);
             res.send(result);
         })
+
+
+        app.get('/products', async (req, res) => {
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 10;
+            const skip = (page - 1) * limit;
+            const searchQuery = req.query.search || "";
+        
+            const total = await productCollection.countDocuments({ name: { $regex: searchQuery, $options: 'i' } });
+            const products = await productCollection.find({ name: { $regex: searchQuery, $options: 'i' } })
+                .skip(skip)
+                .limit(limit)
+                .toArray();
+        
+            res.send({
+                total,
+                page,
+                limit,
+                products
+            });
+        });
+        
         
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
