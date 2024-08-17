@@ -6,7 +6,14 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 const port = process.env.PORT || 5000;
 
 // middleware
-app.use(cors());
+app.use(cors({
+    origin: [
+        'http://localhost:5173',
+        'https://star-plus-36a0f.web.app',
+        'https://star-plus-36a0f.firebaseapp.com'
+    ],
+    credentials: true 
+}));
 app.use(express.json());
 
 
@@ -43,7 +50,6 @@ async function run() {
             const searchQuery = req.query.search || "";
             const selectedCategory = req.query.category || "";
             const selectedBrand = req.query.name || "";
-            const selectedPriceRange = req.query.price || "";
             const sortOption = req.query.sort || "";
         
             // Build the query object
@@ -57,16 +63,6 @@ async function run() {
                 query.name = selectedBrand;
             }
         
-            if (selectedPriceRange) {
-                const priceRange = selectedPriceRange.split('-').map(price => parseFloat(price));
-                if (priceRange.length === 2) {
-                  const [minPrice, maxPrice] = priceRange;
-                  query.price = { $gte: minPrice.toString(), $lte: maxPrice.toString() };
-                } else if (priceRange.length === 1) {
-                  const maxPrice = priceRange[0];
-                  query.price = { $lte: maxPrice.toString() };
-                }
-              }
               
         
             // Count total documents based on the query

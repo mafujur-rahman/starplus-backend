@@ -1,5 +1,5 @@
-```markdown
-# E-commerce Product Listing Backend
+
+# Star Plus E-commerce Product Listing Backend
 
 This repository contains the backend server for the E-commerce Product Listing application. The backend is built with Node.js, Express.js, and MongoDB, providing APIs for product data and user authentication.
 
@@ -8,16 +8,16 @@ This repository contains the backend server for the E-commerce Product Listing a
 - API endpoints to fetch and manipulate product data.
 - Pagination, search, filter, and sort functionalities.
 - Integration with MongoDB for data storage.
-- Mongoose schema for product data.
 
 ## Prerequisites
 
 - Node.js and npm (Node Package Manager)
 - MongoDB (local or cloud-based, e.g., MongoDB Atlas)
 
-## Installation
+## Local Setup
 
 1. Clone the repository:
+2. npm install
+3. node index.js
 
-   ```bash
-   git clone https://github.com/yourusername/backend-repo.git
+Thank you for visiting Star Plus!🌟
